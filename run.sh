@@ -29,8 +29,6 @@ RELAY_PORT="${RELAY_PORT:-587}"
 DOMAIN=`echo ${SERVER_HOSTNAME} | awk 'BEGIN{FS=OFS="."}{print $(NF-1),$NF}'`
 
 # Set needed config options
-#add_config_value "maillog_file" "/dev/stdout"
-add_config_value "maillog_file" "/var/log/maillog"
 add_config_value "myhostname" ${SERVER_HOSTNAME}
 add_config_value "mydomain" ${DOMAIN}
 add_config_value "mydestination" "${DESTINATION:-localhost}"
@@ -262,6 +260,9 @@ fi
 STDOUT_LOGGER="${STDOUT_LOGGER:-TRUE}"
 if [ "${STDOUT_LOGGER,,}" == "true" ]; then
   echo "postlog   unix-dgram n  -       n       -       1       postlogd" >> /etc/postfix/master.cf
+  add_config_value "maillog_file" "/dev/stdout"
+else
+  add_config_value "maillog_file" "/var/log/maillog"
 fi
 
 #Start services
