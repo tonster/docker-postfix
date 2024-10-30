@@ -1,0 +1,26 @@
+---
+version: "2"
+services:
+  postfix:
+    build: .
+    image: tonster/postfix:latest
+    container_name: postfix
+    #privileged: true
+    environment:
+      - TZ=America/Detroit
+      - SMTP_SERVER=mail.tonster.com
+      - SMTP_PORT=587
+      - SASL_PASSWORD_FILE=/etc/postfix/sasl_passwd
+      - SERVER_HOSTNAME=ratbert.tonster.com
+      - SMTP_NETWORKS='127.0.0.0/8 192.168.0.0/20 75.61.90.128/26 67.172.87.150/32 45.79.146.186/32 45.33.105.232/32 45.79.186.112/32 52.7.157.95/32 52.70.125.224/32 52.204.246.185/32 52.205.85.65/32 10.0.0.0/24 10.1.0.0/24 10.2.0.0/24 137.135.69.140/32 40.117.230.197/32 40.85.175.59/32 24.127.52.147/32 52.168.181.248/32'
+    volumes:
+      - /docker-app-data/postfix/sasl_passwd:/etc/postfix/sasl_passwd
+    ports:
+      - 127.0.0.1:25:25
+    networks:
+      - ratbert
+    restart: unless-stopped
+
+networks:
+  ratbert:
+    external: true
