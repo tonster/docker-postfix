@@ -259,7 +259,6 @@ fi
 
 STDOUT_LOGGER="${STDOUT_LOGGER:-TRUE}"
 if [ "${STDOUT_LOGGER,,}" == "true" ]; then
-  echo "postlog   unix-dgram n  -       n       -       1       postlogd" >> /etc/postfix/master.cf
   add_config_value "maillog_file" "/dev/stdout"
 else
   add_config_value "maillog_file" "/var/log/maillog"
