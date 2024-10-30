@@ -3,24 +3,35 @@ version: "2"
 services:
   postfix:
     build: .
-    image: tonster/postfix:latest
+    image: tonster/postfix:1.3
     container_name: postfix
-    #privileged: true
     environment:
       - TZ=America/Detroit
-      - SMTP_SERVER=mail.tonster.com
-      - SMTP_PORT=587
-      - SASL_PASSWORD_FILE=/etc/postfix/sasl_passwd
-      - SERVER_HOSTNAME=ratbert.tonster.com
-      - SMTP_NETWORKS='127.0.0.0/8 192.168.0.0/20 75.61.90.128/26 67.172.87.150/32 45.79.146.186/32 45.33.105.232/32 45.79.186.112/32 52.7.157.95/32 52.70.125.224/32 52.204.246.185/32 52.205.85.65/32 10.0.0.0/24 10.1.0.0/24 10.2.0.0/24 137.135.69.140/32 40.117.230.197/32 40.85.175.59/32 24.127.52.147/32 52.168.181.248/32'
+      - SERVER_HOSTNAME=mta.domain.com
+      - SMTP_NETWORKS=127.0.0.0/8 192.168.0.0/24
+      - SSL_CERT_PATH=/etc/postfix/fullchain.pem
+      - SSL_KEY_PATH=/etc/postfix/privkey.pem
+      - RELAY_DOMAINS="relay.domain.com"
+      - SMTPD_SASL_AUTH_ENABLE=yes
+      - SMTPD_RECIPIENT_RESTRICTIONS=reject_non_fqdn_recipient, permit_sasl_authenticated, permit_mynetworks, reject_unlisted_recipient, reject_invalid_helo_hostname, reject_non_fqdn_sender, reject_unknown_sender_domain,check_relay_domains,permit
+      - MESSAGE_SIZE_LIMIT=10485760
+      - MAILBOX_SIZE_LIMIT=26214400
+      - SMTP_TLS_FINGERPRINT_DIGEST=sha256
+      - SMTPD_TLS_FINGERPRINT_DIGEST=sha256
+      - STDOUT_LOGGER=TRUE
     volumes:
       - /docker-app-data/postfix/sasl_passwd:/etc/postfix/sasl_passwd
+      - /docker-app-data/postfix/postconfig.sh:/postconfig.sh
+      - /docker-app-data/postfix/var/spool/postfix:/var/spool/postfix
+      - /docker-app-data/postfix/etc/postfix/fullchain.pem:/etc/postfix/fullchain.pem
+      - /docker-app-data/postfix/etc/postfix/privkey.pem:/etc/postfix/privkey.pem
+      - /var/log/maillog:/var/log/maillog
+      #- /dev/log:/dev/log
+      #- /run/systemd/journal/dev-log:/dev/log
     ports:
-      - 127.0.0.1:25:25
-    networks:
-      - ratbert
+      - 25:25
+      - 26:26
+      - 465:465
+      - 587:587
     restart: unless-stopped
 
-networks:
-  ratbert:
-    external: true

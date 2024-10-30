@@ -4,7 +4,7 @@ FROM alpine:latest
 MAINTAINER Tony Publiski tonster@tonster.com
 
 RUN apk update && \
-    apk add bash gawk cyrus-sasl cyrus-sasl-login cyrus-sasl-crammd5 mailx \
+    apk add bash gawk cyrus-sasl cyrus-sasl-login cyrus-sasl-crammd5 mailx nagios-plugins-mailq \
     postfix tzdata && \
     rm -rf /var/cache/apk/* && \
     mkdir -p /var/log/supervisor/ /var/run/supervisor/ && \
